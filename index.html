@@ -1614,7 +1614,47 @@ function closePCSheet(){
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- TRANSACTION TIMELINE -->
+      <div class="detail-section">
+        <div class="detail-section-lbl">📅 Transaction Timeline</div>
+        <div class="detail-group">
+          
+          <!-- Contract & COE Dates -->
+          <div class="detail-row">
+            <div class="detail-row-icon">📋</div>
+            <div class="detail-row-content">
+              <div class="detail-row-lbl">Contract Accepted</div>
+              <input class="detail-edit-input" id="dtContractDate" type="date">
+            </div>
+          </div>
+          
+          <div class="detail-row">
+            <div class="detail-row-icon">🏁</div>
+            <div class="detail-row-content">
+              <div class="detail-row-lbl">Close of Escrow (COE)</div>
+              <input class="detail-edit-input" id="dtCOE" type="date">
+            </div>
+          </div>
+          
+          <!-- Progress Bar -->
+          <div style="margin:16px 0 12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+              <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:.5px">PROGRESS</div>
+              <div style="font-size:11px;font-weight:700;color:var(--coral)" id="dtProgress">0 of 8</div>
+            </div>
+            <div style="height:6px;background:#E5E5E5;border-radius:3px;overflow:hidden">
+              <div id="dtProgressBar" style="height:100%;background:var(--coral);width:0%;transition:width .3s"></div>
+            </div>
+          </div>
+          
+          <!-- Milestones -->
+          <div id="dtMilestones" style="display:flex;flex-direction:column;gap:10px"></div>
+          
+        </div>
+      </div>
+
+    
 
     <!-- BASIC INFO -->
     <div class="detail-section">
