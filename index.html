@@ -1683,35 +1683,7 @@ function closePCSheet(){
     </div>
 
     <!-- CONTRACT DATES -->
-      <div class="detail-section">
-        <div class="detail-section-lbl">📅 Transaction Timeline</div>
-        <div class="detail-group">
-          <div class="contract-dates-row">
-            <div class="contract-date-field">
-              <div class="contract-date-lbl">Contract Accepted</div>
-              <input class="contract-date-input" id="dtContractDate" type="date" onchange="calcMilestones()">
-            </div>
-            <div class="contract-date-field">
-              <div class="contract-date-lbl">Close of Escrow</div>
-              <input class="contract-date-input" id="dtCOE" type="date" onchange="calcMilestones()">
-            </div>
-          </div>
-
-          <!-- MILESTONE PROGRESS BAR -->
-          <div class="milestone-progress-wrap" id="dtMilestoneProgress" style="display:none">
-            <div class="milestone-progress-label">
-              <div class="milestone-progress-title">Transaction Progress</div>
-              <div class="milestone-progress-pct" id="dtProgressPct">0 of 8 complete</div>
-            </div>
-            <div class="milestone-bar-bg">
-              <div class="milestone-bar-fill" id="dtProgressBar" style="width:0%"></div>
-            </div>
-          </div>
-
-          <!-- MILESTONES -->
-          <div id="dtMilestones"></div>
-        </div>
-      </div>
+      
 
       <!-- POST-CLOSE FOLLOW UPS (shows for My People) -->
       <div id="dtFollowUpDates" style="display:none">
