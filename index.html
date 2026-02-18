@@ -28,7 +28,7 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
 
 /* SCREENS */
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;z-index:1;transition:opacity .3s,transform .3s}
-.screen.hidden{display:none!important}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
 
 /* ═══════════ TOP BAR ═══════════ */
 .top-bar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:52px 18px 10px;flex-shrink:0;gap:8px}
@@ -345,9 +345,6 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
 .contract-property-lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);font-weight:800;margin-bottom:4px}
 .contract-property-addr{font-size:15px;font-weight:700;color:var(--dark);line-height:1.4}
 
-
-.close-x{position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#666;cursor:pointer;transition:all .15s;z-index:10}
-.close-x:active{background:rgba(0,0,0,.12);transform:scale(.92)}
 </style>
 </head>
 <body>
@@ -457,7 +454,6 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
 <div class="overlay hidden" id="pcOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="close-x" onclick="closePCSheet()">✕</div>
     <div class="sh">
       <div class="sheet-title">HOW'D IT GO?</div>
       <div class="sheet-sub" id="pcSub">Log your call</div>
@@ -467,13 +463,36 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
         <div class="oc-btn" id="oc-voicemail" onclick="pickOutcome('voicemail')"><span class="oci">📬</span>Voicemail</div>
       </div>
 
-      <textarea class="modal-notes" id="callNotes" placeholder="Quick note... (use keyboard dictation)" style="width:100%;box-sizing:border-box"></textarea>
+      <div class="notes-wrap">
+        <textarea class="modal-notes" id="callNotes" placeholder="Quick note... tap 🎙 to speak"></textarea>
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎙</button>
+      </div>
       <button class="save-btn" onclick="saveCall()">SAVE & NEXT LEAD ›</button>
     </div>
   </div>
-</div
+</div>
 
->
+
+
+<!-- ══════════════ PLAY DETAIL SHEET ══════════════ -->
+<div class="overlay hidden" id="playOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sh">
+      <div class="sheet-title" id="playDetailTitle">PLAY</div>
+      <div class="sheet-sub" id="playDetailSub"></div>
+      <div class="script-card call-type" style="margin-bottom:13px">
+        <div class="sc-head">
+          <div class="sc-tag" id="playScriptTag">📞 SCRIPT / APPROACH</div>
+          <button class="copy-btn" id="copyPlayBtn" onclick="copyEl('playScriptBody','copyPlayBtn')">⎘ Copy</button>
+        </div>
+        <div class="sc-body" id="playScriptBody"></div>
+      </div>
+      <button class="save-btn" id="playActionBtn" onclick="executePlay()">LET'S GO ›</button>
+      <button class="cancel-btn" onclick="closePlay()">Maybe Later</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════ ADD LEAD SCREEN ══════════════ -->
 
@@ -507,22 +526,11 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
       </div>
     </div>
     <div>
-      <label class="f-lbl">Stage *</label>
-      <div class="tog-row" style="margin-bottom:8px">
-        <div class="tog-opt" id="sHot" onclick="setStage('hot')">🔥 Hot</div>
-        <div class="tog-opt" id="sWarm" onclick="setStage('warm')">☀️ Warm</div>
-      </div>
+      <label class="f-lbl">Stage</label>
       <div class="tog-row">
-        <div class="tog-opt" id="sContract" onclick="setStage('contract')">📋 Contract</div>
-        <div class="tog-opt" id="sPeople" onclick="setStage('people')">💛 My People</div>
+        <div class="tog-opt" id="sHot" onclick="setStage('hot')">🔥 Hot</div>
+        <div class="tog-opt sel" id="sWarm" onclick="setStage('warm')">☀️ Warm</div>
       </div>
-    </div>
-    
-    <!-- CONTRACT FIELDS (show when Contract selected) -->
-    <div id="addContractFields" style="display:none">
-      <div><label class="f-lbl">Contract Accepted Date *</label><input class="f-in" id="aContractDate" type="date"></div>
-      <div><label class="f-lbl">Close of Escrow Date *</label><input class="f-in" id="aCOE" type="date"></div>
-      <div><label class="f-lbl">Property Address *</label><input class="f-in" id="aContractAddr" type="text" placeholder="e.g. 1845 W Bullard Ave, Fresno CA"></div>
     </div>
     <div><label class="f-lbl">Full Name *</label><input class="f-in" id="aName" type="text" placeholder="e.g. Lisa Johnson" autocomplete="name"></div>
     <div><label class="f-lbl">Phone Number *</label><input class="f-in" id="aPhone" type="tel" placeholder="(559) 555-0100" autocomplete="tel"></div>
@@ -532,7 +540,10 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
     <div><label class="f-lbl">Birthday <span style="font-weight:600;opacity:.5">(optional)</span></label><input class="f-in" id="aBirthday" type="date"></div>
     <div>
       <label class="f-lbl">Key Situation <span style="font-weight:600;opacity:.5">(motivator)</span></label>
-      <input class="f-in" id="aNote" type="text" placeholder="e.g. Needs to sell in 60 days... (use keyboard dictation)">
+      <div class="add-note-wrap">
+        <input class="f-in" id="aNote" type="text" placeholder="e.g. Needs to sell in 60 days..." style="padding-right:48px">
+        <button class="add-mic" id="addMicBtn" onclick="toggleAddMic()">🎙</button>
+      </div>
     </div>
     <div>
       <label class="f-lbl">Personal Notes <span style="font-weight:600;opacity:.5">(spouse, pets, interests...)</span></label>
@@ -919,7 +930,32 @@ function doCall(){
     const ph=l.phone.replace(/\D/g,'');
     if(!ph){toast('Invalid phone number');return;}
     
-    // Just open phone dialer - don't show post-call sheet
+    // Log the call BEFORE opening dialer
+    l.calls=(l.calls||0)+1;
+    l.lastContact=new Date().toISOString();
+    stats.callsToday=(stats.callsToday||0)+1;
+    stats.weekCalls=(stats.weekCalls||0)+1;
+    stats.pts=(stats.pts||0)+5;
+    save();
+    
+    // Show post-call sheet BEFORE opening dialer so it's waiting when user returns
+    try {
+      outcome=null;
+      ['answered','noanswer','voicemail'].forEach(o=>{
+        const el=document.getElementById('oc-'+o);
+        if(el)el.className='oc-btn';
+      });
+      const notes=document.getElementById('callNotes');
+      if(notes)notes.value='';
+      const sub=document.getElementById('pcSub');
+      if(sub)sub.textContent='Log your call with '+l.name;
+      const overlay=document.getElementById('pcOverlay');
+      if(overlay)overlay.classList.remove('hidden');
+    } catch(e) {
+      console.error('Post-call sheet error:',e);
+    }
+    
+    // Open phone dialer LAST (this will leave the app)
     window.open('tel:'+ph, '_self');
     
   } catch(e) {
@@ -927,7 +963,6 @@ function doCall(){
     toast('Error making call');
   }
 }
-
 
 
 
@@ -978,22 +1013,9 @@ function saveCall(){
   const active=getTabLeads();
   const l=active[idx];
   const notes=document.getElementById('callNotes').value.trim();
-  
-  // Log the call NOW (when outcome is saved)
-  l.calls=(l.calls||0)+1;
-  l.lastContact=new Date().toISOString();
-  stats.callsToday=(stats.callsToday||0)+1;
-  stats.weekCalls=(stats.weekCalls||0)+1;
-  
   if(outcome==='answered'){l.connects=(l.connects||0)+1;stats.connectsToday=(stats.connectsToday||0)+1;stats.weekConnects=(stats.weekConnects||0)+1;stats.pts=(stats.pts||0)+20;}
   else stats.pts=(stats.pts||0)+8;
-  // Add timestamp to notes
-  if(notes){
-    const now=new Date();
-    const timestamp=now.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
-    const timestampedNote='['+timestamp+'] '+notes;
-    l.note=timestampedNote+(l.note?'\n'+l.note:'');
-  }
+  if(notes)l.note=notes+(l.note?' · '+l.note:'');
   l.lastOutcome=outcome;save();
   document.getElementById('pcOverlay').classList.add('hidden');
   toast(outcome==='answered'?'🎉 Connect! +25 pts':'+8 pts logged ✓');
@@ -1036,32 +1058,10 @@ function deleteLead(){
 function closeDelete(){document.getElementById('deleteOverlay').classList.add('hidden')}
 
 /* ═══════════════════ ADD LEAD ═══════════════════ */
-function goAdd(){
-  document.getElementById('screen-main').classList.add('hidden');
-  document.getElementById('screen-add').classList.remove('hidden');
-  addType='buyer';
-  addStage=''; // No default
-  // Clear all stage selections
-  ['sHot','sWarm','sContract','sPeople'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.classList.remove('sel');
-  });
-  // Hide contract fields
-  const cf=document.getElementById('addContractFields');
-  if(cf) cf.style.display='none';
-}
+function goAdd(){document.getElementById('screen-main').classList.add('hidden');document.getElementById('screen-add').classList.remove('hidden');addType='buyer';addStage='warm';}
 function goBack(){document.getElementById('screen-add').classList.add('hidden');document.getElementById('screen-main').classList.remove('hidden');render()}
 function setType(t){addType=t;document.getElementById('tBuyer').classList.toggle('sel',t==='buyer');document.getElementById('tSeller').classList.toggle('sel',t==='seller')}
-function setStage(s){
-  addStage=s;
-  document.getElementById('sHot').classList.toggle('sel',s==='hot');
-  document.getElementById('sWarm').classList.toggle('sel',s==='warm');
-  document.getElementById('sContract').classList.toggle('sel',s==='contract');
-  document.getElementById('sPeople').classList.toggle('sel',s==='people');
-  // Show/hide contract fields
-  const cf=document.getElementById('addContractFields');
-  if(cf) cf.style.display=s==='contract'?'block':'none';
-}
+function setStage(s){addStage=s;document.getElementById('sHot').classList.toggle('sel',s==='hot');document.getElementById('sWarm').classList.toggle('sel',s==='warm')}
 function saveLead(){
   try {
     const name=document.getElementById('aName').value.trim();
@@ -1069,17 +1069,6 @@ function saveLead(){
     
     if(!name){toast('Name is required');return;}
     if(!phone){toast('Phone is required');return;}
-    if(!addStage){toast('Please select a stage');return;}
-    
-    // Validate contract fields if Contract selected
-    if(addStage==='contract'){
-      const contractDate=document.getElementById('aContractDate').value;
-      const coeDate=document.getElementById('aCOE').value;
-      const contractAddr=document.getElementById('aContractAddr').value.trim();
-      if(!contractDate){toast('Contract date required');return;}
-      if(!coeDate){toast('COE date required');return;}
-      if(!contractAddr){toast('Property address required for contracts');return;}
-    }
     
     const nl={
       id:Date.now(),
@@ -1100,14 +1089,6 @@ function saveLead(){
       lastContact:null
     };
     
-    // Add contract fields if Contract stage
-    if(addStage==='contract'){
-      nl.contractDate=document.getElementById('aContractDate').value;
-      nl.coeDate=document.getElementById('aCOE').value;
-      nl.contractAddr=document.getElementById('aContractAddr').value.trim();
-      nl.milestones={};
-    }
-    
     // Add to leads array
     if(addStage==='hot'){
       leads.unshift(nl);
@@ -1124,7 +1105,7 @@ function saveLead(){
     save();
     
     // Clear form
-    ['aName','aPhone','aAddr','aSource','aEmail','aNote','aBirthday','aPersonal','aContractDate','aCOE','aContractAddr'].forEach(id=>{
+    ['aName','aPhone','aAddr','aSource','aEmail','aNote','aBirthday','aPersonal'].forEach(id=>{
       const el=document.getElementById(id);
       if(el) el.value='';
     });
@@ -1145,8 +1126,26 @@ function saveLead(){
 /* ═══════════════════ VOICE ═══════════════════ */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 function mkRec(cb){if(!SR)return null;const r=new SR();r.continuous=false;r.interimResults=false;r.lang='en-US';r.onresult=e=>cb(e.results[0][0].transcript);r.onerror=()=>toast('Mic error — check permissions');return r;}
+function toggleMic(){
+  if(!SR){toast('Voice input not supported here');return}
+  const btn=document.getElementById('micBtn');
+  if(isRec){recognition.stop();isRec=false;btn.classList.remove('rec');btn.textContent='🎙';return}
+  recognition=mkRec(t=>{const ta=document.getElementById('callNotes');ta.value=(ta.value?ta.value+' ':'')+t;isRec=false;btn.classList.remove('rec');btn.textContent='🎙';toast('✓ Transcribed!');});
+  if(!recognition)return;
+  recognition.onend=()=>{isRec=false;btn.classList.remove('rec');btn.textContent='🎙'};
+  recognition.start();isRec=true;btn.classList.add('rec');btn.textContent='⏹';toast('Listening...');
+}
+function toggleAddMic(){
+  if(!SR){toast('Voice input not supported here');return}
+  const btn=document.getElementById('addMicBtn');
+  if(addIsRec){addRec.stop();addIsRec=false;btn.classList.remove('rec');btn.textContent='🎙';return}
+  addRec=mkRec(t=>{const inp=document.getElementById('aNote');inp.value=(inp.value?inp.value+' ':'')+t;addIsRec=false;btn.classList.remove('rec');btn.textContent='🎙';toast('✓ Transcribed!');});
+  if(!addRec)return;
+  addRec.onend=()=>{addIsRec=false;btn.classList.remove('rec');btn.textContent='🎙'};
+  addRec.start();addIsRec=true;btn.classList.add('rec');btn.textContent='⏹';toast('Listening...');
+}
 
-
+/* ═══════════════════ SCOREBOARD ═══════════════════ */
 function getAutoVoice(){
   /* Reads behavior and picks Motivator or Competitor tone automatically */
   const c=stats.callsToday||0;
@@ -1366,8 +1365,8 @@ const MILESTONES = [
   {id:'inspect',  name:'Inspections Complete',       day:17, icon:'🔍'},
   {id:'negotiat', name:'Negotiations Complete',      day:17, icon:'🤝'},
   {id:'loan',     name:'Loan Contingency Removed',   day:17, icon:'🏛️'},
-  {id:'ctc',      name:'Clear to Close',             day:-5, icon:'✅'},
-  {id:'closed',   name:'Closed!',                    day:0,  icon:'🔑'},
+  {id:'ctc',      name:'Clear to Close',             day:null,icon:'✅'},
+  {id:'closed',   name:'Closed!',                    day:null,icon:'🔑'},
 ];
 
 function getMilestoneState(){
@@ -1406,18 +1405,10 @@ function calcMilestones(){
     if(isDone) doneCount++;
 
     let dueDate = null;
-    const coeDate = coeVal ? new Date(coeVal) : null;
     if(m.day && contractDate){
-      if(m.day > 0){
-        // Positive days: count forward from contract date
-        dueDate = new Date(contractDate.getTime() + m.day*86400000);
-      } else if(m.day < 0 && coeDate){
-        // Negative days: count back from COE
-        dueDate = new Date(coeDate.getTime() + m.day*86400000);
-      }
-    } else if(m.day === 0 && coeDate){
-      // Day 0 = COE date
-      dueDate = coeDate;
+      dueDate = new Date(contractDate.getTime() + m.day*86400000);
+    } else if(m.id==='ctc' || m.id==='closed'){
+      dueDate = coeVal ? new Date(coeVal) : null;
     }
 
     // Determine status
@@ -1551,24 +1542,6 @@ function dtDeleteConfirmed() {
   closeDetail();
 }
 
-
-
-
-
-
-function closePCSheet(){
-  document.getElementById('pcOverlay').classList.add('hidden');
-  // Clear selections
-  outcome=null;
-  ['answered','noanswer','voicemail'].forEach(o=>{
-    const el=document.getElementById('oc-'+o);
-    if(el) el.className='oc-btn';
-  });
-  const notes=document.getElementById('callNotes');
-  if(notes) notes.value='';
-}
-
-
 </script>
 
 <!-- ══════════ CONTACT DETAIL SCREEN ══════════ -->
@@ -1602,7 +1575,55 @@ function closePCSheet(){
         </div>
       </div>
 
-      
+      <!-- CONTRACT DATES -->
+      <div class="detail-section">
+        <div class="detail-section-lbl">📅 Transaction Timeline</div>
+        <div class="detail-group">
+          <div class="contract-dates-row">
+            <div class="contract-date-field">
+              <div class="contract-date-lbl">Contract Accepted</div>
+              <input class="contract-date-input" id="dtContractDate" type="date" onchange="calcMilestones()">
+            </div>
+            <div class="contract-date-field">
+              <div class="contract-date-lbl">Close of Escrow</div>
+              <input class="contract-date-input" id="dtCOE" type="date" onchange="calcMilestones()">
+            </div>
+          </div>
+
+          <!-- MILESTONE PROGRESS BAR -->
+          <div class="milestone-progress-wrap" id="dtMilestoneProgress" style="display:none">
+            <div class="milestone-progress-label">
+              <div class="milestone-progress-title">Transaction Progress</div>
+              <div class="milestone-progress-pct" id="dtProgressPct">0 of 8 complete</div>
+            </div>
+            <div class="milestone-bar-bg">
+              <div class="milestone-bar-fill" id="dtProgressBar" style="width:0%"></div>
+            </div>
+          </div>
+
+          <!-- MILESTONES -->
+          <div id="dtMilestones"></div>
+        </div>
+      </div>
+
+      <!-- POST-CLOSE FOLLOW UPS (shows for My People) -->
+      <div id="dtFollowUpDates" style="display:none">
+        <div class="detail-section">
+          <div class="detail-section-lbl">📬 Post-Close Follow-Ups</div>
+          <div class="detail-group">
+            <div class="detail-row" style="background:#F0F5FF">
+              <div class="detail-row-icon">📅</div>
+              <div class="detail-row-content">
+                <div class="detail-row-lbl">Auto-Scheduled Check-Ins</div>
+                <div style="font-size:12px;font-weight:700;color:#1A73E8;line-height:2" id="dtFollowUpList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
     <!-- NOTES -->
     <div class="detail-section">
       <div class="detail-section-lbl">Situation / Notes</div>
@@ -1614,47 +1635,7 @@ function closePCSheet(){
           </div>
         </div>
       </div>
-
-      <!-- TRANSACTION TIMELINE -->
-      <div class="detail-section">
-        <div class="detail-section-lbl">📅 Transaction Timeline</div>
-        <div class="detail-group">
-          
-          <!-- Contract & COE Dates -->
-          <div class="detail-row">
-            <div class="detail-row-icon">📋</div>
-            <div class="detail-row-content">
-              <div class="detail-row-lbl">Contract Accepted</div>
-              <input class="detail-edit-input" id="dtContractDate" type="date">
-            </div>
-          </div>
-          
-          <div class="detail-row">
-            <div class="detail-row-icon">🏁</div>
-            <div class="detail-row-content">
-              <div class="detail-row-lbl">Close of Escrow (COE)</div>
-              <input class="detail-edit-input" id="dtCOE" type="date">
-            </div>
-          </div>
-          
-          <!-- Progress Bar -->
-          <div style="margin:16px 0 12px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-              <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:.5px">PROGRESS</div>
-              <div style="font-size:11px;font-weight:700;color:var(--coral)" id="dtProgress">0 of 8</div>
-            </div>
-            <div style="height:6px;background:#E5E5E5;border-radius:3px;overflow:hidden">
-              <div id="dtProgressBar" style="height:100%;background:var(--coral);width:0%;transition:width .3s"></div>
-            </div>
-          </div>
-          
-          <!-- Milestones -->
-          <div id="dtMilestones" style="display:flex;flex-direction:column;gap:10px"></div>
-          
-        </div>
-      </div>
-
-    
+    </div>
 
     <!-- BASIC INFO -->
     <div class="detail-section">
@@ -1720,27 +1701,6 @@ function closePCSheet(){
           <div class="detail-tog" id="dtSPeople" onclick="dtSetStage('people')" style="flex:1;min-width:80px">💛 My People</div>
         </div>
       </div>
-    </div>
-
-    <!-- CONTRACT DATES -->
-      
-
-      <!-- POST-CLOSE FOLLOW UPS (shows for My People) -->
-      <div id="dtFollowUpDates" style="display:none">
-        <div class="detail-section">
-          <div class="detail-section-lbl">📬 Post-Close Follow-Ups</div>
-          <div class="detail-group">
-            <div class="detail-row" style="background:#F0F5FF">
-              <div class="detail-row-icon">📅</div>
-              <div class="detail-row-content">
-                <div class="detail-row-lbl">Auto-Scheduled Check-Ins</div>
-                <div style="font-size:12px;font-weight:700;color:#1A73E8;line-height:2" id="dtFollowUpList"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
 
     <!-- PERSONAL -->
