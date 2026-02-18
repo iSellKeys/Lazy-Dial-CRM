@@ -345,6 +345,18 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
 .contract-property-lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);font-weight:800;margin-bottom:4px}
 .contract-property-addr{font-size:15px;font-weight:700;color:var(--dark);line-height:1.4}
 
+
+/* ═══════════ DAILY PLAYS ═══════════ */
+.play-item{display:flex;gap:14px;padding:16px;background:var(--softgray);border-radius:14px;margin-bottom:12px;cursor:pointer;transition:all .15s;border:2px solid transparent}
+.play-item:active{background:#E8F5E9;border-color:var(--green)}
+.play-check{width:28px;height:28px;border-radius:50%;border:2.5px solid #DDD;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all .2s}
+.play-check.done{background:var(--green);border-color:var(--green)}
+.play-content{flex:1}
+.play-title{font-size:14px;font-weight:800;color:var(--dark);margin-bottom:4px}
+.play-desc{font-size:12px;color:#666;line-height:1.5;margin-bottom:6px}
+.play-pts{font-size:11px;font-weight:800;color:var(--green);letter-spacing:.5px}
+.close-x{position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#666;cursor:pointer;transition:all .15s;z-index:10}
+.close-x:active{background:rgba(0,0,0,.12);transform:scale(.92)}
 </style>
 </head>
 <body>
@@ -454,6 +466,7 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
 <div class="overlay hidden" id="pcOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
+    <div class="close-x" onclick="closePCSheet()">✕</div>
     <div class="sh">
       <div class="sheet-title">HOW'D IT GO?</div>
       <div class="sheet-sub" id="pcSub">Log your call</div>
@@ -463,14 +476,52 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
         <div class="oc-btn" id="oc-voicemail" onclick="pickOutcome('voicemail')"><span class="oci">📬</span>Voicemail</div>
       </div>
 
-      <div class="notes-wrap">
-        <textarea class="modal-notes" id="callNotes" placeholder="Quick note... tap 🎙 to speak"></textarea>
-        <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎙</button>
-      </div>
+      <textarea class="modal-notes" id="callNotes" placeholder="Quick note... (use keyboard dictation)" style="width:100%;box-sizing:border-box"></textarea>
       <button class="save-btn" onclick="saveCall()">SAVE & NEXT LEAD ›</button>
     </div>
   </div>
-</div>
+</div
+
+<!-- ══════════════ DAILY PLAYS MODAL ══════════════ -->
+<div id="playsOv" class="hidden">
+  <div class="sum-wrap">
+    <div class="sum-head">
+      <div class="sum-back" onclick="closePlays()">←</div>
+      <div class="sum-title">💡 DAILY PLAYS</div>
+    </div>
+    <div class="sum-body">
+      <div class="sum-lbl" style="margin-bottom:16px">Quick prospecting ideas to keep your pipeline full</div>
+      
+      <div class="play-item" onclick="togglePlay(0)">
+        <div class="play-check" id="play0">⚪</div>
+        <div class="play-content">
+          <div class="play-title">📞 Call 5 Expired Listings</div>
+          <div class="play-desc">Find fresh expireds in your farm area and make contact today</div>
+          <div class="play-pts">+40 pts</div>
+        </div>
+      </div>
+      
+      <div class="play-item" onclick="togglePlay(1)">
+        <div class="play-check" id="play1">⚪</div>
+        <div class="play-content">
+          <div class="play-title">🚪 Door Knock Your Farm</div>
+          <div class="play-desc">Hit 20 doors in your territory — leave your card and a smile</div>
+          <div class="play-pts">+50 pts</div>
+        </div>
+      </div>
+      
+      <div class="play-item" onclick="togglePlay(2)">
+        <div class="play-check" id="play2">⚪</div>
+        <div class="play-content">
+          <div class="play-title">💬 Text 10 Past Clients</div>
+          <div class="play-desc">Quick check-in: "How's the house treating you?"</div>
+          <div class="play-pts">+30 pts</div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>>
 
 
 
@@ -526,11 +577,22 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
       </div>
     </div>
     <div>
-      <label class="f-lbl">Stage</label>
-      <div class="tog-row">
+      <label class="f-lbl">Stage *</label>
+      <div class="tog-row" style="margin-bottom:8px">
         <div class="tog-opt" id="sHot" onclick="setStage('hot')">🔥 Hot</div>
-        <div class="tog-opt sel" id="sWarm" onclick="setStage('warm')">☀️ Warm</div>
+        <div class="tog-opt" id="sWarm" onclick="setStage('warm')">☀️ Warm</div>
       </div>
+      <div class="tog-row">
+        <div class="tog-opt" id="sContract" onclick="setStage('contract')">📋 Contract</div>
+        <div class="tog-opt" id="sPeople" onclick="setStage('people')">💛 My People</div>
+      </div>
+    </div>
+    
+    <!-- CONTRACT FIELDS (show when Contract selected) -->
+    <div id="addContractFields" style="display:none">
+      <div><label class="f-lbl">Contract Accepted Date *</label><input class="f-in" id="aContractDate" type="date"></div>
+      <div><label class="f-lbl">Close of Escrow Date *</label><input class="f-in" id="aCOE" type="date"></div>
+      <div><label class="f-lbl">Property Address *</label><input class="f-in" id="aContractAddr" type="text" placeholder="e.g. 1845 W Bullard Ave, Fresno CA"></div>
     </div>
     <div><label class="f-lbl">Full Name *</label><input class="f-in" id="aName" type="text" placeholder="e.g. Lisa Johnson" autocomplete="name"></div>
     <div><label class="f-lbl">Phone Number *</label><input class="f-in" id="aPhone" type="tel" placeholder="(559) 555-0100" autocomplete="tel"></div>
@@ -540,10 +602,7 @@ body::after{content:'';position:fixed;width:240px;height:240px;background:rgba(2
     <div><label class="f-lbl">Birthday <span style="font-weight:600;opacity:.5">(optional)</span></label><input class="f-in" id="aBirthday" type="date"></div>
     <div>
       <label class="f-lbl">Key Situation <span style="font-weight:600;opacity:.5">(motivator)</span></label>
-      <div class="add-note-wrap">
-        <input class="f-in" id="aNote" type="text" placeholder="e.g. Needs to sell in 60 days..." style="padding-right:48px">
-        <button class="add-mic" id="addMicBtn" onclick="toggleAddMic()">🎙</button>
-      </div>
+      <input class="f-in" id="aNote" type="text" placeholder="e.g. Needs to sell in 60 days... (use keyboard dictation)">
     </div>
     <div>
       <label class="f-lbl">Personal Notes <span style="font-weight:600;opacity:.5">(spouse, pets, interests...)</span></label>
@@ -1013,9 +1072,22 @@ function saveCall(){
   const active=getTabLeads();
   const l=active[idx];
   const notes=document.getElementById('callNotes').value.trim();
+  
+  // Log the call NOW (when outcome is saved)
+  l.calls=(l.calls||0)+1;
+  l.lastContact=new Date().toISOString();
+  stats.callsToday=(stats.callsToday||0)+1;
+  stats.weekCalls=(stats.weekCalls||0)+1;
+  
   if(outcome==='answered'){l.connects=(l.connects||0)+1;stats.connectsToday=(stats.connectsToday||0)+1;stats.weekConnects=(stats.weekConnects||0)+1;stats.pts=(stats.pts||0)+20;}
   else stats.pts=(stats.pts||0)+8;
-  if(notes)l.note=notes+(l.note?' · '+l.note:'');
+  // Add timestamp to notes
+  if(notes){
+    const now=new Date();
+    const timestamp=now.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
+    const timestampedNote='['+timestamp+'] '+notes;
+    l.note=timestampedNote+(l.note?'\n'+l.note:'');
+  }
   l.lastOutcome=outcome;save();
   document.getElementById('pcOverlay').classList.add('hidden');
   toast(outcome==='answered'?'🎉 Connect! +25 pts':'+8 pts logged ✓');
@@ -1058,10 +1130,32 @@ function deleteLead(){
 function closeDelete(){document.getElementById('deleteOverlay').classList.add('hidden')}
 
 /* ═══════════════════ ADD LEAD ═══════════════════ */
-function goAdd(){document.getElementById('screen-main').classList.add('hidden');document.getElementById('screen-add').classList.remove('hidden');addType='buyer';addStage='warm';}
+function goAdd(){
+  document.getElementById('screen-main').classList.add('hidden');
+  document.getElementById('screen-add').classList.remove('hidden');
+  addType='buyer';
+  addStage=''; // No default
+  // Clear all stage selections
+  ['sHot','sWarm','sContract','sPeople'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('sel');
+  });
+  // Hide contract fields
+  const cf=document.getElementById('addContractFields');
+  if(cf) cf.style.display='none';
+}
 function goBack(){document.getElementById('screen-add').classList.add('hidden');document.getElementById('screen-main').classList.remove('hidden');render()}
 function setType(t){addType=t;document.getElementById('tBuyer').classList.toggle('sel',t==='buyer');document.getElementById('tSeller').classList.toggle('sel',t==='seller')}
-function setStage(s){addStage=s;document.getElementById('sHot').classList.toggle('sel',s==='hot');document.getElementById('sWarm').classList.toggle('sel',s==='warm')}
+function setStage(s){
+  addStage=s;
+  document.getElementById('sHot').classList.toggle('sel',s==='hot');
+  document.getElementById('sWarm').classList.toggle('sel',s==='warm');
+  document.getElementById('sContract').classList.toggle('sel',s==='contract');
+  document.getElementById('sPeople').classList.toggle('sel',s==='people');
+  // Show/hide contract fields
+  const cf=document.getElementById('addContractFields');
+  if(cf) cf.style.display=s==='contract'?'block':'none';
+}
 function saveLead(){
   try {
     const name=document.getElementById('aName').value.trim();
@@ -1069,6 +1163,17 @@ function saveLead(){
     
     if(!name){toast('Name is required');return;}
     if(!phone){toast('Phone is required');return;}
+    if(!addStage){toast('Please select a stage');return;}
+    
+    // Validate contract fields if Contract selected
+    if(addStage==='contract'){
+      const contractDate=document.getElementById('aContractDate').value;
+      const coeDate=document.getElementById('aCOE').value;
+      const contractAddr=document.getElementById('aContractAddr').value.trim();
+      if(!contractDate){toast('Contract date required');return;}
+      if(!coeDate){toast('COE date required');return;}
+      if(!contractAddr){toast('Property address required for contracts');return;}
+    }
     
     const nl={
       id:Date.now(),
@@ -1089,6 +1194,14 @@ function saveLead(){
       lastContact:null
     };
     
+    // Add contract fields if Contract stage
+    if(addStage==='contract'){
+      nl.contractDate=document.getElementById('aContractDate').value;
+      nl.coeDate=document.getElementById('aCOE').value;
+      nl.contractAddr=document.getElementById('aContractAddr').value.trim();
+      nl.milestones={};
+    }
+    
     // Add to leads array
     if(addStage==='hot'){
       leads.unshift(nl);
@@ -1105,7 +1218,7 @@ function saveLead(){
     save();
     
     // Clear form
-    ['aName','aPhone','aAddr','aSource','aEmail','aNote','aBirthday','aPersonal'].forEach(id=>{
+    ['aName','aPhone','aAddr','aSource','aEmail','aNote','aBirthday','aPersonal','aContractDate','aCOE','aContractAddr'].forEach(id=>{
       const el=document.getElementById(id);
       if(el) el.value='';
     });
@@ -1126,26 +1239,8 @@ function saveLead(){
 /* ═══════════════════ VOICE ═══════════════════ */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 function mkRec(cb){if(!SR)return null;const r=new SR();r.continuous=false;r.interimResults=false;r.lang='en-US';r.onresult=e=>cb(e.results[0][0].transcript);r.onerror=()=>toast('Mic error — check permissions');return r;}
-function toggleMic(){
-  if(!SR){toast('Voice input not supported here');return}
-  const btn=document.getElementById('micBtn');
-  if(isRec){recognition.stop();isRec=false;btn.classList.remove('rec');btn.textContent='🎙';return}
-  recognition=mkRec(t=>{const ta=document.getElementById('callNotes');ta.value=(ta.value?ta.value+' ':'')+t;isRec=false;btn.classList.remove('rec');btn.textContent='🎙';toast('✓ Transcribed!');});
-  if(!recognition)return;
-  recognition.onend=()=>{isRec=false;btn.classList.remove('rec');btn.textContent='🎙'};
-  recognition.start();isRec=true;btn.classList.add('rec');btn.textContent='⏹';toast('Listening...');
-}
-function toggleAddMic(){
-  if(!SR){toast('Voice input not supported here');return}
-  const btn=document.getElementById('addMicBtn');
-  if(addIsRec){addRec.stop();addIsRec=false;btn.classList.remove('rec');btn.textContent='🎙';return}
-  addRec=mkRec(t=>{const inp=document.getElementById('aNote');inp.value=(inp.value?inp.value+' ':'')+t;addIsRec=false;btn.classList.remove('rec');btn.textContent='🎙';toast('✓ Transcribed!');});
-  if(!addRec)return;
-  addRec.onend=()=>{addIsRec=false;btn.classList.remove('rec');btn.textContent='🎙'};
-  addRec.start();addIsRec=true;btn.classList.add('rec');btn.textContent='⏹';toast('Listening...');
-}
 
-/* ═══════════════════ SCOREBOARD ═══════════════════ */
+
 function getAutoVoice(){
   /* Reads behavior and picks Motivator or Competitor tone automatically */
   const c=stats.callsToday||0;
@@ -1365,8 +1460,8 @@ const MILESTONES = [
   {id:'inspect',  name:'Inspections Complete',       day:17, icon:'🔍'},
   {id:'negotiat', name:'Negotiations Complete',      day:17, icon:'🤝'},
   {id:'loan',     name:'Loan Contingency Removed',   day:17, icon:'🏛️'},
-  {id:'ctc',      name:'Clear to Close',             day:null,icon:'✅'},
-  {id:'closed',   name:'Closed!',                    day:null,icon:'🔑'},
+  {id:'ctc',      name:'Clear to Close',             day:-5, icon:'✅'},
+  {id:'closed',   name:'Closed!',                    day:0,  icon:'🔑'},
 ];
 
 function getMilestoneState(){
@@ -1405,10 +1500,18 @@ function calcMilestones(){
     if(isDone) doneCount++;
 
     let dueDate = null;
+    const coeDate = coeVal ? new Date(coeVal) : null;
     if(m.day && contractDate){
-      dueDate = new Date(contractDate.getTime() + m.day*86400000);
-    } else if(m.id==='ctc' || m.id==='closed'){
-      dueDate = coeVal ? new Date(coeVal) : null;
+      if(m.day > 0){
+        // Positive days: count forward from contract date
+        dueDate = new Date(contractDate.getTime() + m.day*86400000);
+      } else if(m.day < 0 && coeDate){
+        // Negative days: count back from COE
+        dueDate = new Date(coeDate.getTime() + m.day*86400000);
+      }
+    } else if(m.day === 0 && coeDate){
+      // Day 0 = COE date
+      dueDate = coeDate;
     }
 
     // Determine status
@@ -1542,6 +1645,35 @@ function dtDeleteConfirmed() {
   closeDetail();
 }
 
+
+function openPlays(){
+  document.getElementById('playsOv').classList.remove('hidden');
+}
+function closePlays(){
+  document.getElementById('playsOv').classList.add('hidden');
+}
+function togglePlay(n){
+  const el=document.getElementById('play'+n);
+  if(el.classList.contains('done')){
+    el.classList.remove('done');
+    el.textContent='⚪';
+  }else{
+    el.classList.add('done');
+    el.textContent='✓';
+  }
+}
+
+function closePCSheet(){
+  document.getElementById('pcOverlay').classList.add('hidden');
+  // Clear selections
+  outcome=null;
+  ['answered','noanswer','voicemail'].forEach(o=>{
+    const el=document.getElementById('oc-'+o);
+    if(el) el.className='oc-btn';
+  });
+  const notes=document.getElementById('callNotes');
+  if(notes) notes.value='';
+}
 </script>
 
 <!-- ══════════ CONTACT DETAIL SCREEN ══════════ -->
