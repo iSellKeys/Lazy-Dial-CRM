@@ -602,154 +602,11 @@ let recognition=null, isRec=false, addRec=null, addIsRec=false;
 let currentPlay=null;
 
 if(!leads.length){
-  leads=[
-    /* ── 🔥 HOT LEADS ── */
-    {
-      id:1,name:'Marcus Webb',phone:'5595550101',type:'seller',
-      address:'4821 N Blackstone Ave, Fresno CA',source:'Expired Listing',
-      note:'Needs to sell in 60 days — relocating to Austin for new job. Super motivated.',
-      priority:'hot',calls:3,connects:1,texts:1,
-      lastContact:new Date(Date.now()-172800000).toISOString(),
-      lastOutcome:'answered',
-      email:'marcus.webb@gmail.com',birthday:'1978-06-14',
-      personalNotes:'Wife is Sarah. Two kids. Big Dodgers fan. Dog named Ranger.',
-      stage:'hot'
-    },
-    {
-      id:5,name:'Tanya Reeves',phone:'5595550198',type:'buyer',
-      address:'',source:'Open House — Shaw & Marks',
-      note:'Pre-approved $520K. Wants to move before school starts in August. Urgency is real.',
-      priority:'hot',calls:2,connects:2,texts:1,
-      lastContact:new Date(Date.now()-86400000).toISOString(),
-      lastOutcome:'answered',
-      email:'tanya.reeves@gmail.com',birthday:'1985-04-17',
-      personalNotes:'Husband is Derek, works at Community Medical. Two daughters age 7 and 9. Loves Clovis schools.',
-      stage:'hot'
-    },
-    /* ── ☀️ WARM LEADS ── */
-    {
-      id:2,name:'Jennifer Castillo',phone:'5595550182',type:'buyer',
-      address:'',source:'Zillow Inquiry',
-      note:'Pre-approved $480K — wants 3br in Tower District or Fig Garden. First time buyer, a little nervous.',
-      priority:'warm',calls:1,connects:0,texts:1,
-      lastContact:new Date(Date.now()-604800000).toISOString(),
-      lastOutcome:'noanswer',
-      email:'jcastillo@hotmail.com',birthday:'1990-03-22',
-      personalNotes:'Single, works at UCSF Fresno. Has a cat named Mochi. Instagram: @jen.castillo',
-      stage:'warm'
-    },
-    {
-      id:6,name:'David & Lisa Nguyen',phone:'5595550334',type:'seller',
-      address:'5512 N Cedar Ave, Fresno CA',source:'FSBO — spotted on Zillow',
-      note:'Tried to sell themselves for 6 weeks. Getting tired. Price dropped once already.',
-      priority:'warm',calls:2,connects:1,texts:0,
-      lastContact:new Date(Date.now()-1209600000).toISOString(),
-      lastOutcome:'answered',
-      email:'dnguyen@yahoo.com',birthday:'1972-08-30',
-      personalNotes:'David owns a restaurant on Blackstone. Lisa is a nurse. Very price-sensitive — come prepared with comps.',
-      stage:'warm'
-    },
-    /* ── 📋 CONTRACT ── */
-    {
-      id:3,name:'Robert & Diana Flores',phone:'5595550247',type:'seller',
-      address:'3310 W Shields Ave, Fresno CA',source:'Referral — past client Tom Nguyen',
-      note:'Under contract! Inspections cleared. Loan approved. Clear to close — COE March 14.',
-      priority:'hot',calls:6,connects:5,texts:3,
-      lastContact:new Date(Date.now()-86400000).toISOString(),
-      lastOutcome:'answered',
-      email:'rflores@gmail.com',birthday:'1965-11-03',
-      personalNotes:'Robert is retired, Diana is a teacher. Love to travel. Very detail-oriented — always communicate clearly and proactively.',
-      stage:'contract',
-      contractDate:'2026-02-15',
-      contractAddr:'3310 W Shields Ave, Fresno CA',
-      coeDate:'2026-03-14',
-      milestones:{
-        escrow:{done:true,completedDate:'2026-02-15'},
-        emd:{done:true,completedDate:'2026-02-17'},
-        discl:{done:true,completedDate:'2026-02-20'},
-        inspect:{done:true,completedDate:'2026-03-01'},
-        negotiat:{done:true,completedDate:'2026-03-02'},
-        loan:{done:true,completedDate:'2026-03-04'},
-        ctc:{done:true,completedDate:'2026-03-10'},
-        closed:{done:false,completedDate:''}
-      },
-      followups:{
-        days7:new Date('2026-03-21').toISOString(),
-        days30:new Date('2026-04-13').toISOString(),
-        days90:new Date('2026-06-12').toISOString(),
-        anniversary:new Date('2027-03-14').toISOString()
-      }
-    },
-    {
-      id:7,name:'Kevin Sharma',phone:'5595550419',type:'buyer',
-      address:'1845 W Bullard Ave, Fresno CA',source:'Referral — Angela Park',
-      note:'In contract on 1845 W Bullard. Appraisal came in at value. Waiting on loan contingency removal.',
-      priority:'hot',calls:5,connects:5,texts:4,
-      lastContact:new Date(Date.now()-43200000).toISOString(),
-      lastOutcome:'answered',
-      email:'ksharma@gmail.com',birthday:'1988-01-25',
-      personalNotes:'Software engineer at Bitwise. Single. First home purchase — very excited. Loves craft beer and hiking.',
-      stage:'contract',
-      contractDate:'2026-02-10',
-      contractAddr:'1845 W Bullard Ave, Fresno CA',
-      coeDate:'2026-04-02',
-      milestones:{
-        escrow:{done:true,completedDate:'2026-02-10'},
-        emd:{done:true,completedDate:'2026-02-13'},
-        discl:{done:true,completedDate:'2026-02-16'},
-        inspect:{done:true,completedDate:'2026-02-24'},
-        negotiat:{done:true,completedDate:'2026-02-25'},
-        loan:{done:false,completedDate:''},
-        ctc:{done:false,completedDate:''},
-        closed:{done:false,completedDate:''}
-      },
-      followups:{
-        days7:new Date('2026-04-09').toISOString(),
-        days30:new Date('2026-05-02').toISOString(),
-        days90:new Date('2026-07-01').toISOString(),
-        anniversary:new Date('2027-04-02').toISOString()
-      }
-    },
-    /* ── 💛 MY PEOPLE ── */
-    {
-      id:4,name:'Angela Park',phone:'5595550312',type:'seller',
-      address:'2847 E Olive Ave, Fresno CA',source:'Past Client — closed Jan 2025',
-      note:'Closed escrow Jan 15, 2025. Referred Kevin Sharma already — gold client.',
-      priority:'warm',calls:8,connects:7,texts:4,
-      lastContact:new Date(Date.now()-5184000000).toISOString(),
-      lastOutcome:'answered',
-      email:'angela.park@icloud.com',birthday:'1982-09-08',
-      personalNotes:'Loves wine tasting and hiking. Two golden retrievers — Butter and Toast. Husband Kevin is a software engineer. Instagram: @angela.fresno',
-      stage:'people',
-      coeDate:'2025-01-15',
-      followups:{
-        days7:new Date('2025-01-22').toISOString(),
-        days30:new Date('2025-02-14').toISOString(),
-        days90:new Date('2025-04-15').toISOString(),
-        anniversary:new Date('2026-01-15').toISOString()
-      },
-      referrals:1
-    },
-    {
-      id:8,name:'Tom & Grace Nguyen',phone:'5595550501',type:'seller',
-      address:'4102 E Gettysburg Ave, Fresno CA',source:'Past Client — closed Aug 2024',
-      note:'Closed Aug 8, 2024. Sold in 9 days over asking. Raving fans — sent 2 referrals.',
-      priority:'warm',calls:10,connects:9,texts:5,
-      lastContact:new Date(Date.now()-7776000000).toISOString(),
-      lastOutcome:'answered',
-      email:'tnguyen@gmail.com',birthday:'1969-12-15',
-      personalNotes:'Tom owns a restaurant on Blackstone — Pho Nguyen. Grace teaches at Clovis West. Season ticket holders for Fresno FC. Referred David Nguyen and Robert Flores.',
-      stage:'people',
-      coeDate:'2024-08-08',
-      followups:{
-        days7:new Date('2024-08-15').toISOString(),
-        days30:new Date('2024-09-07').toISOString(),
-        days90:new Date('2024-11-06').toISOString(),
-        anniversary:new Date('2025-08-08').toISOString()
-      },
-      referrals:2
-    },
-  ];save();
+  leads=[];
+if(!leads.length){
+  // Empty on first load - user will add their own leads
+  save();
+}
 }
 
 /* ═══════════════════ UTILS ═══════════════════ */
@@ -790,15 +647,7 @@ const motivatorHigh=["You're building something real — keep going! 💪","Mome
 const motivatorLow=["Every dial is a step closer to the close. Let's go!","One call today can change your whole week. Make it.","The pipeline doesn't build itself — but you can. Right now.","Your next closed deal starts with your next call. Dial.","Champions show up even on slow days. This is that day."];
 const competitorHigh=["Your competition already called 10 people today. You're keeping up.","Top producers don't take days off. Neither do you.","You're lapping every agent who's still checking their phone.","The leaderboard isn't official — but you're winning it."];
 const competitorLow=["Your competition is dialing right now. Are you?","Someone else is calling YOUR leads. Don't let them.","The agent who calls more wins. Simple as that.","While you're waiting, another agent is closing your deal.","Every hour you don't dial is an hour your competition does."];
-const quotes=[
-  {q:"Success is the sum of small efforts repeated day in and day out.",a:"— Robert Collier"},
-  {q:"The secret of getting ahead is getting started.",a:"— Mark Twain"},
-  {q:"You don't have to be great to start, but you have to start to be great.",a:"— Zig Ziglar"},
-  {q:"The difference between try and triumph is just a little umph.",a:"— Marvin Phillips"},
-  {q:"Every morning you have two choices: continue to sleep with your dreams, or wake up and chase them.",a:"— Unknown"},
-  {q:"Real estate is not about selling homes. It's about building relationships.",a:"— Unknown"},
-  {q:"Your income is directly related to your philosophy, not the economy.",a:"— Jim Rohn"},
-];
+const quotes=[];
 
 /* ═══════════════════ RENDER ═══════════════════ */
 function render(){
@@ -1390,9 +1239,7 @@ function showSummary(){
       :`${wc} calls this week — you're in the top 10% of agents for activity. This kind of consistency is exactly what builds a referral-based business. Keep it going.`;
   }
   document.getElementById('sumInsight').textContent=insight;
-  const q=quotes[Math.floor(Math.random()*quotes.length)];
-  document.getElementById('sumQuote').textContent='"'+q.q+'"';
-  document.getElementById('sumAuthor').textContent=q.a;
+
   document.getElementById('summaryOv').classList.remove('hidden');
 }
 function closeSummary(){document.getElementById('summaryOv').classList.add('hidden')}
