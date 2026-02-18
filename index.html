@@ -919,32 +919,7 @@ function doCall(){
     const ph=l.phone.replace(/\D/g,'');
     if(!ph){toast('Invalid phone number');return;}
     
-    // Log the call BEFORE opening dialer
-    l.calls=(l.calls||0)+1;
-    l.lastContact=new Date().toISOString();
-    stats.callsToday=(stats.callsToday||0)+1;
-    stats.weekCalls=(stats.weekCalls||0)+1;
-    stats.pts=(stats.pts||0)+5;
-    save();
-    
-    // Show post-call sheet BEFORE opening dialer so it's waiting when user returns
-    try {
-      outcome=null;
-      ['answered','noanswer','voicemail'].forEach(o=>{
-        const el=document.getElementById('oc-'+o);
-        if(el)el.className='oc-btn';
-      });
-      const notes=document.getElementById('callNotes');
-      if(notes)notes.value='';
-      const sub=document.getElementById('pcSub');
-      if(sub)sub.textContent='Log your call with '+l.name;
-      const overlay=document.getElementById('pcOverlay');
-      if(overlay)overlay.classList.remove('hidden');
-    } catch(e) {
-      console.error('Post-call sheet error:',e);
-    }
-    
-    // Open phone dialer LAST (this will leave the app)
+    // Just open phone dialer - don't show post-call sheet
     window.open('tel:'+ph, '_self');
     
   } catch(e) {
@@ -952,6 +927,7 @@ function doCall(){
     toast('Error making call');
   }
 }
+
 
 
 
@@ -1591,6 +1567,8 @@ function closePCSheet(){
   const notes=document.getElementById('callNotes');
   if(notes) notes.value='';
 }
+
+
 </script>
 
 <!-- ══════════ CONTACT DETAIL SCREEN ══════════ -->
@@ -1624,55 +1602,7 @@ function closePCSheet(){
         </div>
       </div>
 
-      <!-- CONTRACT DATES -->
-      <div class="detail-section">
-        <div class="detail-section-lbl">📅 Transaction Timeline</div>
-        <div class="detail-group">
-          <div class="contract-dates-row">
-            <div class="contract-date-field">
-              <div class="contract-date-lbl">Contract Accepted</div>
-              <input class="contract-date-input" id="dtContractDate" type="date" onchange="calcMilestones()">
-            </div>
-            <div class="contract-date-field">
-              <div class="contract-date-lbl">Close of Escrow</div>
-              <input class="contract-date-input" id="dtCOE" type="date" onchange="calcMilestones()">
-            </div>
-          </div>
-
-          <!-- MILESTONE PROGRESS BAR -->
-          <div class="milestone-progress-wrap" id="dtMilestoneProgress" style="display:none">
-            <div class="milestone-progress-label">
-              <div class="milestone-progress-title">Transaction Progress</div>
-              <div class="milestone-progress-pct" id="dtProgressPct">0 of 8 complete</div>
-            </div>
-            <div class="milestone-bar-bg">
-              <div class="milestone-bar-fill" id="dtProgressBar" style="width:0%"></div>
-            </div>
-          </div>
-
-          <!-- MILESTONES -->
-          <div id="dtMilestones"></div>
-        </div>
-      </div>
-
-      <!-- POST-CLOSE FOLLOW UPS (shows for My People) -->
-      <div id="dtFollowUpDates" style="display:none">
-        <div class="detail-section">
-          <div class="detail-section-lbl">📬 Post-Close Follow-Ups</div>
-          <div class="detail-group">
-            <div class="detail-row" style="background:#F0F5FF">
-              <div class="detail-row-icon">📅</div>
-              <div class="detail-row-content">
-                <div class="detail-row-lbl">Auto-Scheduled Check-Ins</div>
-                <div style="font-size:12px;font-weight:700;color:#1A73E8;line-height:2" id="dtFollowUpList"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
+      
     <!-- NOTES -->
     <div class="detail-section">
       <div class="detail-section-lbl">Situation / Notes</div>
@@ -1750,6 +1680,55 @@ function closePCSheet(){
           <div class="detail-tog" id="dtSPeople" onclick="dtSetStage('people')" style="flex:1;min-width:80px">💛 My People</div>
         </div>
       </div>
+    </div>
+
+    <!-- CONTRACT DATES -->
+      <div class="detail-section">
+        <div class="detail-section-lbl">📅 Transaction Timeline</div>
+        <div class="detail-group">
+          <div class="contract-dates-row">
+            <div class="contract-date-field">
+              <div class="contract-date-lbl">Contract Accepted</div>
+              <input class="contract-date-input" id="dtContractDate" type="date" onchange="calcMilestones()">
+            </div>
+            <div class="contract-date-field">
+              <div class="contract-date-lbl">Close of Escrow</div>
+              <input class="contract-date-input" id="dtCOE" type="date" onchange="calcMilestones()">
+            </div>
+          </div>
+
+          <!-- MILESTONE PROGRESS BAR -->
+          <div class="milestone-progress-wrap" id="dtMilestoneProgress" style="display:none">
+            <div class="milestone-progress-label">
+              <div class="milestone-progress-title">Transaction Progress</div>
+              <div class="milestone-progress-pct" id="dtProgressPct">0 of 8 complete</div>
+            </div>
+            <div class="milestone-bar-bg">
+              <div class="milestone-bar-fill" id="dtProgressBar" style="width:0%"></div>
+            </div>
+          </div>
+
+          <!-- MILESTONES -->
+          <div id="dtMilestones"></div>
+        </div>
+      </div>
+
+      <!-- POST-CLOSE FOLLOW UPS (shows for My People) -->
+      <div id="dtFollowUpDates" style="display:none">
+        <div class="detail-section">
+          <div class="detail-section-lbl">📬 Post-Close Follow-Ups</div>
+          <div class="detail-group">
+            <div class="detail-row" style="background:#F0F5FF">
+              <div class="detail-row-icon">📅</div>
+              <div class="detail-row-content">
+                <div class="detail-row-lbl">Auto-Scheduled Check-Ins</div>
+                <div style="font-size:12px;font-weight:700;color:#1A73E8;line-height:2" id="dtFollowUpList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- PERSONAL -->
